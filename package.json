@@ -1,0 +1,39 @@
+{
+	"name": "cyberia",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+		"lint": "eslint 'src/**/*.ts'",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mirmohsen/Cyberia.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"bugs": {
+		"url": "https://github.com/mirmohsen/Cyberia/issues"
+	},
+	"homepage": "https://github.com/mirmohsen/Cyberia#readme",
+	"devDependencies": {
+		"@types/express": "^5.0.2",
+		"@types/node": "^22.15.21",
+		"dotenv": "^16.5.0",
+		"express": "^5.1.0",
+		"install": "^0.13.0",
+		"nodemon": "^3.1.10",
+		"npm": "^11.4.1",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"mongoose": "^8.15.0"
+	}
+}
