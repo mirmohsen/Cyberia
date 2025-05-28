@@ -23,3 +23,8 @@ export async function createUser(createUserDto: CreateUserDto) {
 	const create = await userModel.create({ ...createUserDto, password: hashed });
 	return create;
 }
+
+export async function findUser(email: string) {
+	const find = await userModel.findOne({ email });
+	return find;
+}
