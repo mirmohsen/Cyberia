@@ -7,16 +7,17 @@ export const authenticateToken = (
 	req: Request,
 	res: Response,
 	next: NextFunction
-) => {
+): void => {
 	const authHeader = req.headers['authorization'];
 	const token = authHeader?.split(' ')[1];
 
 	if (!token) {
-		return res.status(401).json({
+		res.status(401).json({
 			statusCode: 401,
 			success: false,
 			message: 'Access token is missing',
 		});
+		return;
 	}
 
 	try {
@@ -24,7 +25,7 @@ export const authenticateToken = (
 		(req as any).user = user;
 		next();
 	} catch (err) {
-		return res.status(403).json({
+		res.status(403).json({
 			statusCode: 403,
 			success: false,
 			message: 'Invalid or expired token',
