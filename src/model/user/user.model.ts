@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { ObjectId, Schema, model } from 'mongoose';
 import { CreateUserDto } from '../../dto/user.dto';
 import { hashPassword } from '../../utils/bcrypt.helper';
 
@@ -15,6 +15,11 @@ const userModel = model('User', UserSchema);
 
 export async function userExist(email: string): Promise<boolean> {
 	const find = await userModel.findOne({ email });
+	return !!find;
+}
+
+export async function userExistById(id: ObjectId): Promise<boolean> {
+	const find = await userModel.findById(id);
 	return !!find;
 }
 
