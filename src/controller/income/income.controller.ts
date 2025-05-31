@@ -46,7 +46,7 @@ export const finds = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
-): Promise<void> => {
+): Promise<any> => {
 	try {
 		const userIdParam = req.query.userId;
 		if (!userIdParam || typeof userIdParam !== 'string') {

@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticateToken } from '../../middleware/authMiddleware';
-import { create } from '../../controller/income/expense.controller';
+import { create } from '../../controller/expense/expense.controller';
 
 const router = express.Router();
 
