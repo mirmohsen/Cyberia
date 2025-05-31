@@ -5,9 +5,11 @@ import { validate } from 'class-validator';
 import { userExistById } from '../../model/user/user.model';
 import {
 	createExpense,
+	deleteExpeneseById,
 	findExpense,
 	updateExpenseById,
 } from '../../model/finance/expense.model';
+import { Types } from 'mongoose';
 
 export const create = async (
 	req: Request,
@@ -105,6 +107,31 @@ export const update = async (
 		res.status(200).json(updatedIncome);
 	} catch (error) {
 		console.error('Update income error:', error);
+		next(error);
+	}
+};
+
+export const deleteExpense = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const expenseIdParam = req.query.expenseId;
+
+		if (!expenseIdParam || typeof expenseIdParam !== 'string') {
+			res.status(400).json({ message: 'Missing or invalid expense ID' });
+			return;
+		}
+
+		const expenseId = new Types.ObjectId(expenseIdParam);
+
+		const deleteExpense = await deleteExpeneseById(expenseId);
+
+		res.status(200).json({ message: 'expense deleted', data: deleteExpense });
+		return;
+	} catch (error) {
+		console.error('Delete Income error:', error);
 		next(error);
 	}
 };

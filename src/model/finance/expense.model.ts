@@ -113,3 +113,12 @@ export async function updateExpenseById(
 
 	return updatedExpense;
 }
+
+export async function deleteExpeneseById(expenseId: Types.ObjectId) {
+	const result = await expenseModel.findByIdAndDelete(expenseId);
+
+	if (!result) {
+		throw new Error('Income not found');
+	}
+	return result;
+}
