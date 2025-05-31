@@ -1,5 +1,4 @@
-import { ObjectId, Schema, Types, model } from 'mongoose';
-import { FilterQuery } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { CreateIncomeDto } from '../../dto/income.dto';
 
 const IncomeSchema = new Schema(
@@ -73,4 +72,37 @@ export async function findIncomes(
 		console.error('DB error in findIncomes:', error);
 		throw error;
 	}
+}
+
+export async function updateIncomeById(
+	incomeId: string,
+	updates: Partial<{
+		user: string;
+		amount: number;
+		source: string;
+		date: Date;
+		note: string;
+	}>
+) {
+	if (!Types.ObjectId.isValid(incomeId)) {
+		throw new Error('Invalid incomeId');
+	}
+
+	if (updates.user && !Types.ObjectId.isValid(updates.user)) {
+		throw new Error('Invalid user ID in updates');
+	}
+
+	const updatedIncome = await incomeModel
+		.findByIdAndUpdate(
+			incomeId,
+			{ $set: updates },
+			{ new: true, runValidators: true }
+		)
+		.populate('user');
+
+	if (!updatedIncome) {
+		throw new Error('Income not found or update failed');
+	}
+
+	return updatedIncome;
 }

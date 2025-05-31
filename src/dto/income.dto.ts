@@ -28,3 +28,27 @@ export class CreateIncomeDto {
 	@IsOptional()
 	note?: string;
 }
+
+export class UpdateIncomeDto {
+	@IsOptional()
+	@IsMongoId()
+	user?: string;
+
+	@IsOptional()
+	@IsNumber()
+	@Type(() => Number)
+	amount?: number;
+
+	@IsOptional()
+	@IsString()
+	source?: string;
+
+	@IsOptional()
+	@IsDate()
+	@Type(() => Date)
+	date?: Date;
+
+	@IsOptional()
+	@IsString()
+	note?: string;
+}
