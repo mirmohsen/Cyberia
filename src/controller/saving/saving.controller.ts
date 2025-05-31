@@ -3,7 +3,11 @@ import { NextFunction, Request, Response } from 'express';
 import { CreateSavingGoalDto } from '../../dto/saving.dto';
 import { validate } from 'class-validator';
 import { userExistById } from '../../model/user/user.model';
-import { createSaving } from '../../model/finance/saving.model';
+import {
+	createSaving,
+	getSavingGoalsByUser,
+} from '../../model/finance/saving.model';
+import mongoose from 'mongoose';
 
 export const create = async (
 	req: Request,
@@ -34,6 +38,28 @@ export const create = async (
 		res.status(201).json(createdSaving);
 	} catch (error) {
 		console.error('Create income error:', error);
+		next(error);
+	}
+};
+
+export const finds = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const userId = req.params.userId;
+
+		if (!mongoose.Types.ObjectId.isValid(userId)) {
+			res.status(400).json({ message: 'Invalid user ID' });
+			return;
+		}
+
+		const goals = await getSavingGoalsByUser(userId);
+		res.status(200).json(goals);
+		return;
+	} catch (error) {
+		console.error('Error fetching saving goals:', error);
 		next(error);
 	}
 };
