@@ -66,6 +66,12 @@ export const finds = async (
 			maxAmount: req.query.maxAmount
 				? parseFloat(req.query.maxAmount as string)
 				: undefined,
+			startDate: req.query.startDate
+				? new Date(req.query.startDate as string)
+				: undefined,
+			endDate: req.query.endDate
+				? new Date(req.query.endDate as string)
+				: undefined,
 		};
 
 		const result = await findIncomes(userId, page, limit, filters);

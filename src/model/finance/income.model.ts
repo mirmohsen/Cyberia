@@ -32,6 +32,8 @@ export async function findIncomes(
 		source?: string;
 		minAmount?: number;
 		maxAmount?: number;
+		startDate?: Date | string;
+		endDate?: Date | string;
 	}
 ) {
 	try {
@@ -52,6 +54,16 @@ export async function findIncomes(
 			}
 			if (filters.maxAmount !== undefined) {
 				query.amount.$lte = filters.maxAmount;
+			}
+		}
+
+		if (filters?.startDate || filters?.endDate) {
+			query.date = {};
+			if (filters.startDate) {
+				query.date.$gte = new Date(filters.startDate);
+			}
+			if (filters.endDate) {
+				query.date.$lte = new Date(filters.endDate);
 			}
 		}
 
