@@ -80,3 +80,36 @@ export async function findExpense(
 		throw error;
 	}
 }
+
+export async function updateExpenseById(
+	expenseId: string,
+	updates: Partial<{
+		user: string;
+		amount: number;
+		description: string;
+		date: Date;
+		note: string;
+	}>
+) {
+	if (!Types.ObjectId.isValid(expenseId)) {
+		throw new Error('Invalid expenseId');
+	}
+
+	if (updates.user && !Types.ObjectId.isValid(updates.user)) {
+		throw new Error('Invalid user ID in updates');
+	}
+
+	const updatedExpense = await expenseModel
+		.findByIdAndUpdate(
+			expenseId,
+			{ $set: updates },
+			{ new: true, runValidators: true }
+		)
+		.populate('user');
+
+	if (!updatedExpense) {
+		throw new Error('expense not found or update failed');
+	}
+
+	return updatedExpense;
+}

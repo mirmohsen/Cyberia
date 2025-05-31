@@ -1,9 +1,13 @@
 import { plainToInstance } from 'class-transformer';
 import { NextFunction, Request, Response } from 'express';
-import { CreateExpenseDto } from '../../dto/expense.dto';
+import { CreateExpenseDto, UpdateExpenseDto } from '../../dto/expense.dto';
 import { validate } from 'class-validator';
 import { userExistById } from '../../model/user/user.model';
-import { createExpense, findExpense } from '../../model/finance/expense.model';
+import {
+	createExpense,
+	findExpense,
+	updateExpenseById,
+} from '../../model/finance/expense.model';
 
 export const create = async (
 	req: Request,
@@ -73,6 +77,34 @@ export const finds = async (
 		res.status(200).json(result);
 	} catch (error) {
 		console.error('Controller error in finds:', error);
+		next(error);
+	}
+};
+
+export const update = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const expenseId = req.body.expenseId;
+		if (!expenseId) {
+			res.status(400).json({ message: 'Missing income ID' });
+			return;
+		}
+
+		const dto = plainToInstance(UpdateExpenseDto, req.body);
+		const errors = await validate(dto);
+		if (errors.length > 0) {
+			res.status(400).json({ message: 'Validation failed', errors });
+			return;
+		}
+
+		const updatedIncome = await updateExpenseById(expenseId, dto);
+
+		res.status(200).json(updatedIncome);
+	} catch (error) {
+		console.error('Update income error:', error);
 		next(error);
 	}
 };

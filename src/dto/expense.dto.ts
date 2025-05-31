@@ -26,3 +26,26 @@ export class CreateExpenseDto {
 	@IsOptional()
 	note?: string;
 }
+
+export class UpdateExpenseDto {
+	@IsOptional()
+	@IsMongoId()
+	user?: string;
+
+	@IsOptional()
+	@IsNumber()
+	@Type(() => Number)
+	amount?: number;
+
+	@IsString()
+	description?: string;
+
+	@IsOptional()
+	@IsDate()
+	@Type(() => Date)
+	date?: Date;
+
+	@IsOptional()
+	@IsString()
+	note?: string;
+}
