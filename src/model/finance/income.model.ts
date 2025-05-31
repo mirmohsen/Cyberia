@@ -106,3 +106,12 @@ export async function updateIncomeById(
 
 	return updatedIncome;
 }
+
+export async function deleteIncomeById(incomeId: Types.ObjectId) {
+	const result = await incomeModel.findByIdAndDelete(incomeId);
+
+	if (!result) {
+		throw new Error('Income not found');
+	}
+	return result;
+}

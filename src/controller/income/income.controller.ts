@@ -4,10 +4,12 @@ import { validate } from 'class-validator';
 import { CreateIncomeDto, UpdateIncomeDto } from '../../dto/income.dto';
 import {
 	createIncome,
+	deleteIncomeById,
 	findIncomes,
 	updateIncomeById,
 } from '../../model/finance/income.model';
 import { userExistById } from '../../model/user/user.model';
+import { Types } from 'mongoose';
 
 export const create = async (
 	req: Request,
@@ -98,6 +100,31 @@ export const update = async (
 		res.status(200).json(updatedIncome);
 	} catch (error) {
 		console.error('Update income error:', error);
+		next(error);
+	}
+};
+
+export const deleteIncome = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const incomeIdParam = req.query.incomeId;
+
+		if (!incomeIdParam || typeof incomeIdParam !== 'string') {
+			res.status(400).json({ message: 'Missing or invalid income ID' });
+			return;
+		}
+
+		const incomeId = new Types.ObjectId(incomeIdParam);
+
+		const deletedIncome = await deleteIncomeById(incomeId);
+
+		res.status(200).json({ message: 'Income deleted', data: deletedIncome });
+		return;
+	} catch (error) {
+		console.error('Delete Income error:', error);
 		next(error);
 	}
 };
