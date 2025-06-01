@@ -1,5 +1,5 @@
 import { ObjectId, Schema, Types, model } from 'mongoose';
-import { CreateSavingGoalDto } from '../../dto/saving.dto';
+import { CreateSavingGoalDto, UpdateSavingGoalDto } from '../../dto/saving.dto';
 
 const SavingSchema = new Schema(
 	{
@@ -53,4 +53,32 @@ export async function deleteSavingById(savingId: Types.ObjectId) {
 	const result = await savingModel.findByIdAndDelete(savingId);
 
 	return result;
+}
+
+export async function updateSavingById(
+	savingId: string,
+	updates: UpdateSavingGoalDto
+) {
+	if (!Types.ObjectId.isValid(savingId)) {
+		throw new Error('Invalid savingId');
+	}
+
+	if (updates.user && !Types.ObjectId.isValid(updates.user.toString())) {
+		throw new Error('Invalid user ID in updates');
+	}
+
+	const existing = await savingModel.findById(savingId);
+	if (!existing) {
+		throw new Error('Saving goal does not exist');
+	}
+
+	const updatedSaving = await savingModel
+		.findByIdAndUpdate(
+			savingId,
+			{ $set: updates },
+			{ new: true, runValidators: true }
+		)
+		.populate('user');
+
+	return updatedSaving;
 }

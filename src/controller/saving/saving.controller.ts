@@ -1,12 +1,13 @@
 import { plainToInstance } from 'class-transformer';
 import { NextFunction, Request, Response } from 'express';
-import { CreateSavingGoalDto } from '../../dto/saving.dto';
+import { CreateSavingGoalDto, UpdateSavingGoalDto } from '../../dto/saving.dto';
 import { validate } from 'class-validator';
 import { userExistById } from '../../model/user/user.model';
 import {
 	createSaving,
 	deleteSavingById,
 	getSavingGoalsByUser,
+	updateSavingById,
 } from '../../model/finance/saving.model';
 import mongoose, { Types } from 'mongoose';
 
@@ -65,7 +66,33 @@ export const finds = async (
 	}
 };
 
-//update
+export const update = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const savingId = req.body.savingId;
+		if (!savingId) {
+			res.status(400).json({ message: 'Missing saving ID' });
+			return;
+		}
+
+		const dto = plainToInstance(UpdateSavingGoalDto, req.body);
+		const errors = await validate(dto);
+		if (errors.length > 0) {
+			res.status(400).json({ message: 'Validation failed', errors });
+			return;
+		}
+
+		const updatedSaving = await updateSavingById(savingId, dto);
+
+		res.status(200).json(updatedSaving);
+	} catch (error) {
+		console.error('Update saving error:', error);
+		next(error);
+	}
+};
 
 export const deleteSaving = async (
 	req: Request,

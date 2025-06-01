@@ -35,3 +35,30 @@ export class CreateSavingGoalDto {
 	@IsString()
 	note?: string;
 }
+
+export class UpdateSavingGoalDto {
+	@IsMongoId()
+	@IsNotEmpty()
+	user?: ObjectId;
+
+	@IsOptional()
+	@IsString()
+	title?: string;
+
+	@IsOptional()
+	@IsNumber()
+	targetAmount?: number;
+
+	@IsOptional()
+	@IsNumber()
+	currentAmount?: number;
+
+	@IsOptional()
+	@Type(() => Date)
+	@IsDate()
+	deadline?: Date;
+
+	@IsOptional()
+	@IsString()
+	note?: string;
+}
