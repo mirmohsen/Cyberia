@@ -46,3 +46,11 @@ export const getSavingGoalsByUser = async (userId: string) => {
 			: null,
 	}));
 };
+
+//update
+
+export async function deleteSavingById(savingId: Types.ObjectId) {
+	const result = await savingModel.findByIdAndDelete(savingId);
+
+	return result;
+}

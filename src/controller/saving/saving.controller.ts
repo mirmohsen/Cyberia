@@ -5,9 +5,10 @@ import { validate } from 'class-validator';
 import { userExistById } from '../../model/user/user.model';
 import {
 	createSaving,
+	deleteSavingById,
 	getSavingGoalsByUser,
 } from '../../model/finance/saving.model';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 export const create = async (
 	req: Request,
@@ -60,6 +61,39 @@ export const finds = async (
 		return;
 	} catch (error) {
 		console.error('Error fetching saving goals:', error);
+		next(error);
+	}
+};
+
+//update
+
+export const deleteSaving = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	try {
+		const savingIdParam = req.params.savingId;
+
+		if (!savingIdParam || typeof savingIdParam !== 'string') {
+			res.status(400).json({ message: 'Missing or invalid saving ID' });
+			return;
+		}
+
+		const savingObjectId = new Types.ObjectId(savingIdParam);
+
+		const deletedSaving = await deleteSavingById(savingObjectId);
+		if (!deletedSaving) {
+			res.status(404).json({ message: 'Saving goal not found' });
+			return;
+		}
+
+		res
+			.status(200)
+			.json({ message: 'Saving goal deleted', data: deletedSaving });
+		return;
+	} catch (error) {
+		console.error('Delete Saving error:', error);
 		next(error);
 	}
 };
