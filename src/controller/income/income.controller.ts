@@ -131,7 +131,7 @@ import { Types } from 'mongoose';
 
 /**
  * @swagger
- * /incomes:
+ * /income/create:
  *   post:
  *     summary: Create a new income record
  *     tags: [Incomes]
@@ -331,7 +331,7 @@ export const create = async (
 
 /**
  * @swagger
- * /incomes:
+ * /income/find:
  *   get:
  *     summary: Get paginated income records filtered by query parameters
  *     tags: [Incomes]
@@ -514,7 +514,7 @@ export const finds = async (
  *           type: string
  *           example: "Missing income ID"
  *
- * /incomes:
+ * /income/update:
  *   put:
  *     summary: Update an existing income record
  *     tags: [Incomes]
@@ -575,7 +575,7 @@ export const update = async (
 
 /**
  * @swagger
- * /incomes:
+ * /income/remove:
  *   delete:
  *     summary: Delete an income by ID
  *     tags: [Incomes]
