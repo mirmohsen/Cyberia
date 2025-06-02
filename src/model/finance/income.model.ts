@@ -1,4 +1,4 @@
-import { Schema, Types, model } from 'mongoose';
+import mongoose, { ObjectId, Schema, Types, model } from 'mongoose';
 import { CreateIncomeDto } from '../../dto/income.dto';
 
 const IncomeSchema = new Schema(
@@ -17,7 +17,7 @@ const IncomeSchema = new Schema(
 	{ timestamps: true }
 );
 
-const incomeModel = model('Income', IncomeSchema);
+export const incomeModel = model('Income', IncomeSchema);
 
 export async function createIncome(createIncome: CreateIncomeDto) {
 	const create = await incomeModel.create(createIncome);
@@ -126,4 +126,29 @@ export async function deleteIncomeById(incomeId: Types.ObjectId) {
 		throw new Error('Income not found');
 	}
 	return result;
+}
+
+export async function MonthlyIncomeSum(userId: string, month: Date) {
+	const start = new Date(month.getFullYear(), month.getMonth(), 1);
+	const end = new Date(month.getFullYear(), month.getMonth() + 1, 1);
+
+	const result = await incomeModel.aggregate([
+		{
+			$match: {
+				user: new mongoose.Types.ObjectId(userId),
+				date: {
+					$gte: start,
+					$lt: end,
+				},
+			},
+		},
+		{
+			$group: {
+				_id: null,
+				total: { $sum: '$amount' },
+			},
+		},
+	]);
+
+	return result[0]?.total || 0;
 }
