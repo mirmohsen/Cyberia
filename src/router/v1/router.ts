@@ -11,6 +11,6 @@ router.use('/auth', authRouter);
 router.use('/income', incomeRouter);
 router.use('/expense', expenseRouter);
 router.use('/saving', savingRouter);
-router.use('finance', financialCalculations);
+router.use('/finance', financialCalculations);
 
 export default router;
