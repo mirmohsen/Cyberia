@@ -6,6 +6,7 @@ import { userExistById } from '../../model/user/user.model';
 import {
 	createSaving,
 	deleteSavingById,
+	exportSavingAsPDF,
 	getSavingGoalsByUser,
 	updateSavingById,
 } from '../../model/finance/saving.model';
@@ -124,3 +125,47 @@ export const deleteSaving = async (
 		next(error);
 	}
 };
+
+export async function exportSavingReport(
+	req: Request,
+	res: Response,
+	next: NextFunction
+) {
+	try {
+		const userId = req.query.userId as string;
+		if (!userId) {
+			res.status(400).json({ message: 'Missing userId' });
+			return;
+		}
+
+		const filters = {
+			title: req.query.title as string,
+			minTargetAmount: req.query.minTargetAmount
+				? Number(req.query.minTargetAmount)
+				: undefined,
+			maxTargetAmount: req.query.maxTargetAmount
+				? Number(req.query.maxTargetAmount)
+				: undefined,
+			minCurrentAmount: req.query.minCurrentAmount
+				? Number(req.query.minCurrentAmount)
+				: undefined,
+			maxCurrentAmount: req.query.maxCurrentAmount
+				? Number(req.query.maxCurrentAmount)
+				: undefined,
+			startDeadline: req.query.startDeadline as string,
+			endDeadline: req.query.endDeadline as string,
+		};
+
+		const pdfBuffer = await exportSavingAsPDF(userId, filters);
+
+		res.set({
+			'Content-Type': 'application/pdf',
+			'Content-Disposition': 'attachment; filename="saving-report.pdf"',
+		});
+		res.send(pdfBuffer);
+	} catch (error) {
+		console.error('Export PDF error:', error);
+		res.status(500).json({ message: 'Failed to export saving report' });
+		next(error);
+	}
+}
