@@ -1,5 +1,7 @@
 import mongoose, { ObjectId, Schema, Types, model } from 'mongoose';
 import { CreateIncomeDto } from '../../dto/income.dto';
+import PDFDocument from 'pdfkit';
+import fs from 'fs';
 
 const IncomeSchema = new Schema(
 	{
@@ -151,4 +153,64 @@ export async function MonthlyIncomeSum(userId: string, month: Date) {
 	]);
 
 	return result[0]?.total || 0;
+}
+
+export async function exportIncomesAsPDF(
+	userId: string,
+	filters?: {
+		source?: string;
+		minAmount?: number;
+		maxAmount?: number;
+		startDate?: Date | string;
+		endDate?: Date | string;
+	}
+): Promise<Buffer> {
+	const objectUserId = new Types.ObjectId(userId);
+
+	const query: any = { user: objectUserId };
+
+	if (filters?.source) query.source = filters.source;
+	if (filters?.minAmount || filters?.maxAmount) {
+		query.amount = {};
+		if (filters.minAmount !== undefined) query.amount.$gte = filters.minAmount;
+		if (filters.maxAmount !== undefined) query.amount.$lte = filters.maxAmount;
+	}
+	if (filters?.startDate || filters?.endDate) {
+		query.date = {};
+		if (filters.startDate) query.date.$gte = new Date(filters.startDate);
+		if (filters.endDate) query.date.$lte = new Date(filters.endDate);
+	}
+
+	const incomes = await incomeModel.find(query).populate('user');
+
+	const doc = new PDFDocument({ margin: 30 });
+	const chunks: any[] = [];
+	doc.on('data', (chunk) => chunks.push(chunk));
+	doc.on('end', () => {});
+
+	doc.fontSize(18).text('Income Report', { align: 'center' });
+	doc.moveDown();
+
+	// Table header
+	doc.fontSize(12).text('Date', 50, doc.y, { continued: true });
+	doc.text('Amount', 150, doc.y, { continued: true });
+	doc.text('Source', 250, doc.y, { continued: true });
+	doc.text('Note', 350, doc.y);
+	doc.moveDown();
+
+	// Table rows
+	incomes.forEach((income) => {
+		const date = income.date ? new Date(income.date).toLocaleDateString() : '-';
+		doc.fontSize(10).text(date, 50, doc.y, { continued: true });
+		doc.text(String(income.amount), 150, doc.y, { continued: true });
+		doc.text(income.source || '-', 250, doc.y, { continued: true });
+		doc.text(income.note || '-', 350, doc.y);
+	});
+
+	doc.end();
+
+	return new Promise((resolve, reject) => {
+		doc.on('end', () => resolve(Buffer.concat(chunks)));
+		doc.on('error', reject);
+	});
 }

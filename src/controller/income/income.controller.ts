@@ -5,6 +5,7 @@ import { CreateIncomeDto, UpdateIncomeDto } from '../../dto/income.dto';
 import {
 	createIncome,
 	deleteIncomeById,
+	exportIncomesAsPDF,
 	findIncomes,
 	updateIncomeById,
 } from '../../model/finance/income.model';
@@ -635,3 +636,41 @@ export const deleteIncome = async (
 		next(error);
 	}
 };
+
+export async function handleExportIncomePDF(
+	req: Request,
+	res: Response,
+	next: NextFunction
+) {
+	try {
+		const userId = typeof req.query.userId === 'string' ? req.query.userId : '';
+
+		if (!userId || !Types.ObjectId.isValid(userId)) {
+			res.status(400).json({ message: 'Invalid user ID' });
+			return;
+		}
+
+		const filters = {
+			source:
+				typeof req.query.source === 'string' ? req.query.source : undefined,
+			minAmount: req.query.minAmount ? Number(req.query.minAmount) : undefined,
+			maxAmount: req.query.maxAmount ? Number(req.query.maxAmount) : undefined,
+			startDate:
+				typeof req.query.startDate === 'string'
+					? req.query.startDate
+					: undefined,
+			endDate:
+				typeof req.query.endDate === 'string' ? req.query.endDate : undefined,
+		};
+
+		const pdfBuffer = await exportIncomesAsPDF(userId, filters);
+
+		res.setHeader('Content-Type', 'application/pdf');
+		res.setHeader('Content-Disposition', 'attachment; filename=incomes.pdf');
+		res.send(pdfBuffer);
+	} catch (error) {
+		console.error('Failed to export income PDF:', error);
+		res.status(500).json({ message: 'Internal Server Error' });
+		next(error);
+	}
+}
