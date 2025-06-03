@@ -12,6 +12,138 @@ import {
 } from '../../model/finance/saving.model';
 import mongoose, { Types } from 'mongoose';
 
+/**
+ * @swagger
+ * tags:
+ *   name: Savings
+ *   description: Saving goal management endpoints
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreateSavingGoalDto:
+ *       type: object
+ *       required:
+ *         - user
+ *       properties:
+ *         user:
+ *           type: string
+ *           description: MongoDB ObjectId of the user
+ *           example: "665a86311375f208fee1647c"
+ *         title:
+ *           type: string
+ *           description: Title of the saving goal
+ *           example: "Vacation Fund"
+ *         targetAmount:
+ *           type: number
+ *           description: Target amount to save
+ *           example: 5000
+ *         currentAmount:
+ *           type: number
+ *           description: Amount already saved
+ *           example: 1500
+ *         deadline:
+ *           type: string
+ *           format: date
+ *           description: Deadline to reach the goal
+ *           example: "2025-12-31"
+ *         note:
+ *           type: string
+ *           description: Optional note
+ *           example: "Trip to Europe"
+ *
+ *     SavingResponse:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           example: "665c44eabcf37ad9c25b2ddf"
+ *         user:
+ *           type: string
+ *           example: "665a86311375f208fee1647c"
+ *         title:
+ *           type: string
+ *           example: "Vacation Fund"
+ *         targetAmount:
+ *           type: number
+ *           example: 5000
+ *         currentAmount:
+ *           type: number
+ *           example: 1500
+ *         deadline:
+ *           type: string
+ *           format: date
+ *           example: "2025-12-31"
+ *         note:
+ *           type: string
+ *           example: "Trip to Europe"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-06-02T10:00:00.000Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-06-02T10:00:00.000Z"
+ *         __v:
+ *           type: number
+ *           example: 0
+ *
+ *     ValidationErrorResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "validation failed"
+ *         errors:
+ *           type: array
+ *           items:
+ *             type: object
+ *             additionalProperties:
+ *               type: string
+ *
+ *     NotFoundResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "User ID does not exist"
+ */
+
+/**
+ * @swagger
+ * /saving/create:
+ *   post:
+ *     summary: Create a new saving goal
+ *     tags: [Savings]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateSavingGoalDto'
+ *     responses:
+ *       201:
+ *         description: Saving goal successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SavingResponse'
+ *       400:
+ *         description: Validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ValidationErrorResponse'
+ *       404:
+ *         description: User ID does not exist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/NotFoundResponse'
+ */
 export const create = async (
 	req: Request,
 	res: Response,
@@ -45,6 +177,96 @@ export const create = async (
 	}
 };
 
+/**
+ * @swagger
+ * tags:
+ *   name: Savings
+ *   description: Saving goals management endpoints
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     SavingGoal:
+ *       type: object
+ *       properties:
+ *         title:
+ *           type: string
+ *           example: "Buy a Laptop"
+ *         targetAmount:
+ *           type: number
+ *           example: 1500
+ *         currentAmount:
+ *           type: number
+ *           example: 400
+ *         deadline:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-12-31T00:00:00.000Z"
+ *         note:
+ *           type: string
+ *           example: "Saving for a MacBook"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-06-01T12:19:19.484Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-06-01T12:19:19.484Z"
+ *         progress:
+ *           type: number
+ *           example: 27
+ *     ServerErrorResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "Internal server error"
+ */
+
+/**
+ * @swagger
+ * /saving/find/{userId}:
+ *   get:
+ *     summary: Get saving goals by user ID
+ *     tags: [Savings]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB ObjectId of the user
+ *         example: "665e909713847e9d15f9c123"
+ *     responses:
+ *       200:
+ *         description: List of saving goals
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/SavingGoal'
+ *       400:
+ *         description: Invalid user ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid user ID
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ServerErrorResponse'
+ */
+
 export const finds = async (
 	req: Request,
 	res: Response,
@@ -66,6 +288,124 @@ export const finds = async (
 		next(error);
 	}
 };
+
+/**
+ * @swagger
+ * /saving/update:
+ *   put:
+ *     summary: Update a saving goal
+ *     tags: [Savings]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - savingId
+ *             properties:
+ *               savingId:
+ *                 type: string
+ *                 description: The ID of the saving goal to update
+ *                 example: "665e909713847e9d15f9c456"
+ *               user:
+ *                 type: string
+ *                 description: ID of the user (optional)
+ *                 example: "665e909713847e9d15f9c123"
+ *               title:
+ *                 type: string
+ *                 description: Title of the saving goal
+ *                 example: "Emergency Fund"
+ *               targetAmount:
+ *                 type: number
+ *                 description: Target amount to save
+ *                 example: 5000
+ *               currentAmount:
+ *                 type: number
+ *                 description: Current amount saved
+ *                 example: 1200
+ *               deadline:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Deadline for the saving goal
+ *                 example: "2025-12-31T00:00:00.000Z"
+ *               note:
+ *                 type: string
+ *                 description: Additional notes
+ *                 example: "Top priority goal"
+ *     responses:
+ *       200:
+ *         description: Saving goal successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SavingGoal'
+ *       400:
+ *         description: Missing saving ID or validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Validation failed
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ServerErrorResponse'
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Savings:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           example: "665e909713847e9d15f9c456"
+ *         user:
+ *           type: string
+ *           example: "665e909713847e9d15f9c123"
+ *         title:
+ *           type: string
+ *           example: "Emergency Fund"
+ *         targetAmount:
+ *           type: number
+ *           example: 5000
+ *         currentAmount:
+ *           type: number
+ *           example: 1200
+ *         deadline:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-12-31T00:00:00.000Z"
+ *         note:
+ *           type: string
+ *           example: "Top priority goal"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-06-01T12:00:00.000Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-06-02T15:00:00.000Z"
+ *     ServerErrorResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "Internal server error"
+ */
 
 export const update = async (
 	req: Request,
@@ -94,6 +434,61 @@ export const update = async (
 		next(error);
 	}
 };
+
+/**
+ * @swagger
+ * /saving/remove/{savingId}:
+ *   delete:
+ *     summary: Delete a saving goal by ID
+ *     tags: [Savings]
+ *     parameters:
+ *       - in: path
+ *         name: savingId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the saving goal to delete
+ *         example: "665e909713847e9d15f9c456"
+ *     responses:
+ *       200:
+ *         description: Saving goal successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Saving goal deleted
+ *                 data:
+ *                   $ref: '#/components/schemas/SavingGoal'
+ *       400:
+ *         description: Missing or invalid saving ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Missing or invalid saving ID
+ *       404:
+ *         description: Saving goal not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Saving goal not found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ServerErrorResponse'
+ */
 
 export const deleteSaving = async (
 	req: Request,
