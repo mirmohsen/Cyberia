@@ -300,7 +300,7 @@ export const finds = async (
 /**
  * @swagger
  * /expense/update:
- *   patch:
+ *   put:
  *     summary: Update an existing expense
  *     description: Updates an expense record by its ID. The ID must be provided in the body as `expenseId`.
  *     tags:
@@ -392,7 +392,7 @@ export const update = async (
 
 /**
  * @swagger
- * /expense/delete:
+ * /expense/remove:
  *   delete:
  *     summary: Delete an expense
  *     tags:
