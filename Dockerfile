@@ -1,23 +1,21 @@
-# Use Node.js image
-FROM node:20
+# Use a secure Node image with no critical or high vulnerabilities
+FROM node:24-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files and install dependencies
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the app
+# Copy the rest of your app
 COPY . .
 
-# Build TypeScript
+# Build your TypeScript app
 RUN npm run build
 
-# Expose port
+# Expose the port your app runs on
 EXPOSE 3000
 
-# Run the app
+# Start the app
 CMD ["node", "dist/index.js"]
